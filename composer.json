@@ -1,0 +1,9 @@
+{
+    "autoload": {
+        "psr-4": {"smartshanghai\\smartticketphp\\": "src"}
+    },
+    "require": {
+        "respect/validation": "^1.0",
+        "guzzlehttp/guzzle": "6.*"
+    }
+}
