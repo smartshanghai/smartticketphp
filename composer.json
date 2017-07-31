@@ -1,4 +1,6 @@
 {
+    "name": "smartshanghai/smartticketphp",
+    "description": "Library for communicating with the SmartTicket.cn API.",
     "autoload": {
         "psr-4": {"smartshanghai\\smartticketphp\\": "src"}
     },
