@@ -14,23 +14,6 @@ class SmartTicket {
     }
 
     /**
-     * @return Client
-     */
-    private function initGuzzleClient($verificationClientId, $verificationClientPassword) {
-        $options = [
-            'base_uri' => $this->baseUri,
-            'headers' => [
-                'X-AUTH' => $verificationClientId.':'.$verificationClientPassword
-            ],
-            'form_params' => $this->apiKey
-        ];
-
-        $client = new Client($options);
-
-        return $client;
-    }
-
-    /**
      * @param $verificationClientId
      * @param $verificationClientPassword
      * @param $electronicTicketToken
@@ -38,8 +21,17 @@ class SmartTicket {
      * @return Response
      */
     public function validateElectronicTicket($electronicTicketToken, $electronicTicketSecret, $verificationClientId, $verificationClientPassword ) {
-        $this->errorMessage = null;
-        $client = $this->initGuzzleClient($verificationClientId, $verificationClientPassword);
+        $options = [
+            'base_uri' => $this->baseUri,
+            'headers' => [
+                'X-AUTH' => $verificationClientId.':'.$verificationClientPassword
+            ],
+            'form_params' => [
+                'key' => $this->apiKey
+            ]
+        ];
+
+        $client = new Client($options);
 
         $options = [
             'form_params' => [
@@ -64,6 +56,28 @@ class SmartTicket {
         $body = json_decode($body);
 
         $response = new Response($body['isSuccessful'], $body['message'], $body['data'], $body['executionTime']);
+
+        return $response;
+    }
+
+    public function getEvents($params) {
+        $options = [
+            'base_uri' => $this->baseUri,
+            'form_params' => [
+                'key' => $this->apiKey
+            ]
+        ];
+
+        if(empty($params['limit']))
+            $params['limit'] = 10;
+
+        $options['form_params'] = array_merge($options['form_params'], $params);
+
+        $client = new Client($options);
+
+        $response = $client->request('GET', '/shows');
+
+        $response = $this->parseResponse($response);
 
         return $response;
     }
