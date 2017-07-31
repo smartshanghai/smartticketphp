@@ -1,0 +1,8 @@
+# Requirements
+
+- SmartTicket.cn API key.
+- For e-ticket verification: verification client ID and password.
+
+# Features
+
+- Ability to remotely verify electronic tickets. If verification fails the API will return an error message, explaining the issue.
