@@ -1,6 +1,7 @@
 {
     "name": "smartshanghai/smartticketphp",
     "description": "Library for communicating with the SmartTicket.cn API.",
+    "license": "MIT",
     "autoload": {
         "psr-4": {"smartshanghai\\smartticketphp\\": "src"}
     },
