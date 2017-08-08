@@ -48,6 +48,53 @@ class SmartTicket {
     }
 
     /**
+     * @param $electronicTicketToken string
+     * @param $electronicTicketSecret string
+     * @param $eventDateId int
+     * @return Response
+     */
+    public function getElectronicTicket($electronicTicketToken, $electronicTicketSecret, $eventDateId) {
+        $options = [
+            'base_uri' => $this->baseUri,
+            'headers' => [
+                'X-KEY' => $this->apiKey
+            ],
+            'form_params' => [
+                'secret' => $electronicTicketSecret,
+                'show_date_id' => $eventDateId
+            ]
+        ];
+
+        $client = new Client($options);
+
+        $response = $client->request('GET', '/tickets/'.$electronicTicketToken);
+
+        $response = $this->parseResponse($response);
+
+        return $response;
+    }
+
+    /**
+     * @param $electronicTicketToken string
+     * @param $electronicTicketSecret string
+     * @param $eventDateId int
+     * @return bool|null True, false, or null if ticket not found.
+     */
+    public function electronicTicketIsVerified($electronicTicketToken, $electronicTicketSecret, $eventDateId) {
+        $response = $this->getElectronicTicket($electronicTicketToken, $electronicTicketSecret, $eventDateId);
+
+        if(!$response->wasSuccessful() || empty($response->getData()))
+            return null;
+
+        $data = $response->getData();
+
+        if(empty($data['verified_on']))
+            return false;
+
+        return true;
+    }
+
+    /**
      * @param $guzzleResponse \GuzzleHttp\Psr7\Response
      * @return mixed
      */
