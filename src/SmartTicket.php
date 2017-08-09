@@ -8,27 +8,30 @@ class SmartTicket {
     private $apiKey;
     private $baseUri;
 
-    public function __construct($apiKey, $baseUri = 'https://www.smartticket.cn/api') {
+    /**
+     * SmartTicket constructor.
+     * @param $apiKey string
+     * @param string $baseUri string If changing the base URI, remember to terminate it with a forward slash (required by Guzzle)
+     */
+    public function __construct($apiKey, $baseUri = 'https://www.smartticket.cn/api/') {
         $this->apiKey = $apiKey;
         $this->baseUri = $baseUri;
     }
 
     /**
-     * @param $verificationClientId
-     * @param $verificationClientPassword
-     * @param $electronicTicketToken
-     * @param $electronicTicketSecret
+     * @param $verificationClientUsername string
+     * @param $verificationClientPassword string
+     * @param $electronicTicketToken string
+     * @param $electronicTicketSecret string
      * @return Response
      */
-    public function validateElectronicTicket($electronicTicketToken, $electronicTicketSecret, $verificationClientId, $verificationClientPassword ) {
+    public function validateElectronicTicket($electronicTicketToken, $electronicTicketSecret, $verificationClientUsername, $verificationClientPassword ) {
         $options = [
             'base_uri' => $this->baseUri,
             'headers' => [
-                'X-AUTH' => $verificationClientId.':'.$verificationClientPassword
+                'X-AUTH' => $verificationClientUsername.':'.$verificationClientPassword,
+                'X-KEY' => $this->apiKey
             ],
-            'form_params' => [
-                'key' => $this->apiKey
-            ]
         ];
 
         $client = new Client($options);
@@ -40,7 +43,7 @@ class SmartTicket {
             ]
         ];
 
-        $response = $client->request('POST', '/verify/tickets', $options);
+        $response = $client->request('POST', 'verify/tickets', $options);
 
         $response = $this->parseResponse($response);
 
@@ -50,24 +53,22 @@ class SmartTicket {
     /**
      * @param $electronicTicketToken string
      * @param $electronicTicketSecret string
-     * @param $eventDateId int
      * @return Response
      */
-    public function getElectronicTicket($electronicTicketToken, $electronicTicketSecret, $eventDateId) {
+    public function getElectronicTicket($electronicTicketToken, $electronicTicketSecret) {
         $options = [
             'base_uri' => $this->baseUri,
             'headers' => [
                 'X-KEY' => $this->apiKey
             ],
-            'form_params' => [
-                'secret' => $electronicTicketSecret,
-                'show_date_id' => $eventDateId
+            'query' => [
+                'secret' => $electronicTicketSecret
             ]
         ];
 
         $client = new Client($options);
 
-        $response = $client->request('GET', '/tickets/'.$electronicTicketToken);
+        $response = $client->request('GET', 'tickets/'.$electronicTicketToken);
 
         $response = $this->parseResponse($response);
 
@@ -77,11 +78,10 @@ class SmartTicket {
     /**
      * @param $electronicTicketToken string
      * @param $electronicTicketSecret string
-     * @param $eventDateId int
      * @return bool|null True, false, or null if ticket not found.
      */
-    public function electronicTicketIsVerified($electronicTicketToken, $electronicTicketSecret, $eventDateId) {
-        $response = $this->getElectronicTicket($electronicTicketToken, $electronicTicketSecret, $eventDateId);
+    public function electronicTicketIsVerified($electronicTicketToken, $electronicTicketSecret) {
+        $response = $this->getElectronicTicket($electronicTicketToken, $electronicTicketSecret);
 
         if(!$response->wasSuccessful() || empty($response->getData()))
             return null;
@@ -97,10 +97,14 @@ class SmartTicket {
     /**
      * @param $guzzleResponse \GuzzleHttp\Psr7\Response
      * @return mixed
+     * @throws \Exception
      */
     private function parseResponse($guzzleResponse) {
+        if($guzzleResponse->getStatusCode() != 200)
+            throw new \Exception('Did not get HTTP 200.');
+
         $body = $guzzleResponse->getBody();
-        $body = json_decode($body);
+        $body = json_decode($body, true);
 
         $response = new Response($body['isSuccessful'], $body['message'], $body['data'], $body['executionTime']);
 
@@ -110,7 +114,7 @@ class SmartTicket {
     public function getEvents($params) {
         $options = [
             'base_uri' => $this->baseUri,
-            'form_params' => [
+            'query' => [
                 'key' => $this->apiKey
             ]
         ];
@@ -122,7 +126,7 @@ class SmartTicket {
 
         $client = new Client($options);
 
-        $response = $client->request('GET', '/shows');
+        $response = $client->request('GET', 'shows');
 
         $response = $this->parseResponse($response);
 
