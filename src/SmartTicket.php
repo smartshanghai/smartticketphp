@@ -114,18 +114,19 @@ class SmartTicket {
         return $response;
     }
 
-    public function getEvents($params) {
+    public function getEvents($params = []) {
         $options = [
             'base_uri' => $this->baseUri,
-            'query' => [
-                'key' => $this->apiKey
-            ]
+            'headers' => [
+                'X-KEY' => $this->apiKey
+            ],
+            'query' => $params
         ];
 
         if(empty($params['limit']))
             $params['limit'] = 10;
 
-        $options['form_params'] = array_merge($options['form_params'], $params);
+        $options['query'] = array_merge($options['query'], $params);
 
         $client = new Client($options);
 
