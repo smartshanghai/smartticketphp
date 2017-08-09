@@ -3,6 +3,7 @@
 namespace smartshanghai\smartticketphp;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class SmartTicket {
     private $apiKey;
@@ -68,7 +69,12 @@ class SmartTicket {
 
         $client = new Client($options);
 
-        $response = $client->request('GET', 'tickets/'.$electronicTicketToken);
+        try {
+            $response = $client->request('GET', 'tickets/' . $electronicTicketToken);
+        }
+        catch(ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         $response = $this->parseResponse($response);
 
@@ -100,9 +106,6 @@ class SmartTicket {
      * @throws \Exception
      */
     private function parseResponse($guzzleResponse) {
-        if($guzzleResponse->getStatusCode() != 200)
-            throw new \Exception('Did not get HTTP 200.');
-
         $body = $guzzleResponse->getBody();
         $body = json_decode($body, true);
 
