@@ -134,7 +134,7 @@ class SmartTicket {
 
         $client = new Client($options);
 
-        $response = $client->request('GET', 'shows');
+        $response = $client->request('GET', 'events');
 
         $response = $this->parseResponse($response);
 
