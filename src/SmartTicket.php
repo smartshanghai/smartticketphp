@@ -102,7 +102,7 @@ class SmartTicket {
 
     /**
      * @param $guzzleResponse \GuzzleHttp\Psr7\Response
-     * @return mixed
+     * @return Response
      * @throws \Exception
      */
     private function parseResponse($guzzleResponse) {
@@ -114,6 +114,10 @@ class SmartTicket {
         return $response;
     }
 
+    /**
+     * @param array $params
+     * @return Response
+     */
     public function getEvents($params = []) {
         $options = [
             'base_uri' => $this->baseUri,
