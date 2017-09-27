@@ -117,6 +117,8 @@ class SmartTicket {
             $response = $e->getResponse();
         }
 
+        $response = $this->parseResponse($response);
+
         return $response;
     }
 
