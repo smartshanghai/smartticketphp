@@ -100,6 +100,26 @@ class SmartTicket {
         return true;
     }
 
+    public function getFeaturedDeals() {
+        $options = [
+            'base_uri' => $this->baseUri,
+            'headers' => [
+                'X-KEY' => $this->apiKey
+            ]
+        ];
+
+        $client = new Client($options);
+
+        try {
+            $response = $client->request('GET', 'featured/deals');
+        }
+        catch(ClientException $e) {
+            $response = $e->getResponse();
+        }
+
+        return $response;
+    }
+
     /**
      * @param $guzzleResponse \GuzzleHttp\Psr7\Response
      * @return Response
